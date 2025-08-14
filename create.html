@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Create Shipment - LibAm Express</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f9fafc; text-align: center; padding: 20px; }
+    header { background-color: #003366; color: white; padding: 20px; }
+    nav a { margin: 0 15px; color: white; text-decoration: none; font-weight: bold; }
+    form { margin-top: 30px; display: inline-block; text-align: left; max-width: 400px; }
+    label { display: block; margin-top: 10px; }
+    input, textarea { width: 100%; padding: 8px; margin-top: 5px; }
+    button { margin-top: 15px; padding: 10px 20px; background-color: #003366; color: white; border: none; cursor: pointer; }
+    button:hover { background-color: #00509e; }
+    #result { margin-top: 20px; font-weight: bold; color: green; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>LibAm Express</h1>
+    <nav>
+      <a href="index.html">Home</a> |
+      <a href="services.html">Services</a> |
+      <a href="contact.html">Contact</a> |
+      <a href="track.html">Track Shipment</a> |
+      <a href="create.html">Create Shipment</a>
+      <a href="quote.html">Request Quote</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Create a New Shipment</h2>
+    <form id="createForm">
+      <label for="sender">Sender Name</label>
+      <input type="text" id="sender" name="sender" required />
+
+      <label for="receiver">Receiver Name</label>
+      <input type="text" id="receiver" name="receiver" required />
+
+      <label for="origin">Origin</label>
+      <input type="text" id="origin" name="origin" required />
+
+      <label for="destination">Destination</label>
+      <input type="text" id="destination" name="destination" required />
+
+      <label for="phone">Receiver Phone Number</label>
+      <input type="tel" id="phone" name="phone" required />
+
+      <label for="description">Shipment Description</label>
+      <textarea id="description" name="description" rows="3" required></textarea>
+
+      <button type="submit">Create Shipment</button>
+    </form>
+
+    <div id="result"></div>
+  </main>
+
+  <script>
+    document.getElementById('createForm').addEventListener('submit', async function(event) {
+      event.preventDefault();
+
+      const sender = document.getElementById('sender').value.trim();
+      const receiver = document.getElementById('receiver').value.trim();
+      const origin = document.getElementById('origin').value.trim();
+      const destination = document.getElementById('destination').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const description = document.getElementById('description').value.trim();
+
+      const resultDiv = document.getElementById('result');
+      resultDiv.textContent = 'Creating shipment...';
+
+      try {
+        const response = await fetch('http://localhost:3000/create-shipment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sender, receiver, origin, destination, phone, description })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          resultDiv.innerHTML = `Shipment created! Your tracking number is: <strong>${data.trackingNumber}</strong>`;
+        } else {
+          resultDiv.textContent = data.error || 'Error creating shipment.';
+        }
+      } catch (error) {
+        resultDiv.textContent = 'Could not connect to server. Please try again later.';
+      }
+    });
+  </script>
+
+</body>
+</html>

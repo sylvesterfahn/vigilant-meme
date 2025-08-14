@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Track Your Shipment - LibAm Express</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9fafc;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    header {
+      background-color: #003366;
+      color: white;
+      padding: 20px;
+    }
+    nav a {
+      margin: 0 15px;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    main {
+      margin-top: 30px;
+    }
+    input[type="text"] {
+      padding: 10px;
+      width: 250px;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #003366;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+    button:hover {
+      background-color: #00509e;
+    }
+    #trackingResult {
+      margin-top: 30px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #003366;
+      min-height: 1.5em;
+    }
+    footer {
+      background-color: #003366;
+      color: white;
+      padding: 10px;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>LibAm Express</h1>
+ <nav>
+  <a href="index.html">Home</a>
+  <a href="services.html">Services</a>
+  <a href="contact.html">Contact</a>
+  <a href="track.html">Track Shipment</a>
+  <a href="create.html">Create Shipment</a>
+  <a href="quote.html">Request Quote</a>
+</nav>
+
+  </header>
+
+  <main>
+    <h2>Track Your Shipment</h2>
+
+    <form id="trackForm">
+      <input type="text" id="trackingNumber" placeholder="Enter your tracking number" required />
+      <button type="submit">Track</button>
+    </form>
+
+    <div id="trackingResult"></div>
+  </main>
+
+  <footer>
+    &copy; 2025 LibAm Express | All Rights Reserved
+  </footer>
+
+  <script>
+    document.getElementById("trackForm").addEventListener("submit", async function(event) {
+      event.preventDefault();
+      const tnInput = document.getElementById("trackingNumber");
+      const tn = tnInput.value.trim().toUpperCase();
+      const resultDiv = document.getElementById("trackingResult");
+
+      if (!tn) {
+        resultDiv.textContent = "Please enter a tracking number.";
+        return;
+      }
+
+      resultDiv.textContent = "Checking status...";
+
+      try {
+        const response = await fetch(`http://localhost:3000/track/${tn}`);
+
+        if (!response.ok) {
+          if (response.status === 404) {
+            resultDiv.textContent = `Tracking number ${tn} not found. Please check and try again.`;
+          } else {
+            resultDiv.textContent = "Error fetching tracking status. Please try again later.";
+          }
+          return;
+        }
+
+        const data = await response.json();
+        resultDiv.textContent = `Status for ${data.trackingNumber}: ${data.status}`;
+      } catch (error) {
+        resultDiv.textContent = "Could not connect to server. Please ensure your backend is running.";
+        console.error(error);
+      }
+    });
+  </script>
+
+</body>
+</html>
